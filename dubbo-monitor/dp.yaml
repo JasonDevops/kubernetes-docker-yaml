@@ -1,0 +1,48 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: dubbo-monitor
+  namespace: infra
+  labels: 
+    name: dubbo-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      name: dubbo-monitor
+  template:
+    metadata:
+      labels: 
+        app: dubbo-monitor
+        name: dubbo-monitor
+    spec:
+      containers:
+      - name: dubbo-monitor
+        image: harbor.od.com/infra/dubbo-monitor:v1
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 20880
+          protocol: TCP
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: configmap-volume
+            mountPath: /dubbo-monitor-simple/conf
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: dubbo-monitor-cm
+      imagePullSecrets:
+      - name: harbor
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      securityContext: 
+        runAsUser: 0
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: 
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600

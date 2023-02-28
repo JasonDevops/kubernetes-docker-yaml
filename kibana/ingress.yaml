@@ -1,0 +1,14 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata: 
+  name: kibana
+  namespace: infra
+spec:
+  rules:
+  - host: kibana.od.com
+    http:
+      paths:
+      - path: /
+        backend: 
+          serviceName: kibana
+          servicePort: 5601

@@ -1,0 +1,99 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: armory-front50
+  name: armory-front50
+  namespace: armory
+spec:
+  replicas: 1
+  revisionHistoryLimit: 7
+  selector:
+    matchLabels:
+      app: armory-front50
+  template:
+    metadata:
+      annotations:
+        artifact.spinnaker.io/location: '"armory"'
+        artifact.spinnaker.io/name: '"armory-front50"'
+        artifact.spinnaker.io/type: '"kubernetes/deployment"'
+        moniker.spinnaker.io/application: '"armory"'
+        moniker.spinnaker.io/cluster: '"front50"'
+      labels:
+        app: armory-front50
+    spec:
+      containers:
+      - name: armory-front50
+        image: harbor.od.com/armory/front50:v1.8.x
+        imagePullPolicy: IfNotPresent
+        command:
+        - bash
+        - -c
+        args:
+        - bash /opt/spinnaker/config/default/fetch.sh && cd /home/spinnaker/config
+          && /opt/front50/bin/front50
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+        - name: JAVA_OPTS
+          value: -javaagent:/opt/front50/lib/jamm-0.2.5.jar -Xmx1000M
+        envFrom:
+        - configMapRef:
+            name: init-env
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 600
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 5
+          successThreshold: 8
+          timeoutSeconds: 1
+        volumeMounts:
+        - mountPath: /etc/podinfo
+          name: podinfo
+        - mountPath: /home/spinnaker/.aws
+          name: credentials
+        - mountPath: /opt/spinnaker/config/default
+          name: default-config
+        - mountPath: /opt/spinnaker/config/custom
+          name: custom-config
+      imagePullSecrets:
+      - name: harbor
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: custom-config
+        name: custom-config
+      - configMap:
+          defaultMode: 420
+          name: default-config
+        name: default-config
+      - name: credentials
+        secret:
+          defaultMode: 420
+          secretName: credentials
+      - downwardAPI:
+          defaultMode: 420
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels
+            path: labels
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations
+            path: annotations
+        name: podinfo

@@ -1,0 +1,14 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata: 
+  name: sonarqube
+  namespace: infra
+spec:
+  rules:
+  - host: sonar.od.com
+    http:
+      paths:
+      - path: /
+        backend: 
+          serviceName: sonarqube
+          servicePort: 80

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: armory-nginx
+  namespace: armory
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  - name: api
+    port: 8085
+    protocol: TCP
+    targetPort: 8085
+  selector:
+    app: armory-nginx

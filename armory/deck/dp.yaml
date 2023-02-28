@@ -1,0 +1,89 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: armory-deck
+  name: armory-deck
+  namespace: armory
+spec:
+  replicas: 1
+  revisionHistoryLimit: 7
+  selector:
+    matchLabels:
+      app: armory-deck
+  template:
+    metadata:
+      annotations:
+        artifact.spinnaker.io/location: '"armory"'
+        artifact.spinnaker.io/name: '"armory-deck"'
+        artifact.spinnaker.io/type: '"kubernetes/deployment"'
+        moniker.spinnaker.io/application: '"armory"'
+        moniker.spinnaker.io/cluster: '"deck"'
+      labels:
+        app: armory-deck
+    spec:
+      containers:
+      - name: armory-deck
+        image: harbor.od.com/armory/deck:v1.8.x
+        imagePullPolicy: IfNotPresent
+        command:
+        - bash
+        - -c
+        args:
+        - bash /opt/spinnaker/config/default/fetch.sh && /entrypoint.sh
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: init-env
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 9000
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: 9000
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 3
+          successThreshold: 5
+          timeoutSeconds: 1
+        volumeMounts:
+        - mountPath: /etc/podinfo
+          name: podinfo
+        - mountPath: /opt/spinnaker/config/default
+          name: default-config
+        - mountPath: /opt/spinnaker/config/custom
+          name: custom-config
+      imagePullSecrets:
+      - name: harbor
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: custom-config
+        name: custom-config
+      - configMap:
+          defaultMode: 420
+          name: default-config
+        name: default-config
+      - downwardAPI:
+          defaultMode: 420
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels
+            path: labels
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations
+            path: annotations
+        name: podinfo

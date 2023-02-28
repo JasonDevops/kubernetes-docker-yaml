@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-service
+  namespace: kube-system
+spec:
+  selector:
+    app: traefik
+  ports:
+    - protocol: TCP
+      port: 80
+      name: web
+    - protocol: TCP
+      port: 8080
+      name: admin-web
+    - protocol: TCP
+      port: 4443
+      name: websecure
+

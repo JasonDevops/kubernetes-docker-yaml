@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: spinnaker
+    web: spinnaker.od.com
+  name: armory-nginx
+  namespace: armory
+  annotations:
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: basic-auth
+spec:
+  rules:
+  - host: spinnaker.od.com
+    http:
+      paths:
+      - backend:
+          serviceName: armory-nginx
+          servicePort: 80

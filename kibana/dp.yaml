@@ -1,0 +1,39 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: kibana
+  namespace: infra
+  labels: 
+    name: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      name: kibana
+  template:
+    metadata:
+      labels: 
+        app: kibana
+        name: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: harbor.od.com/infra/kibana:v6.8.6
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5601
+          protocol: TCP
+        env:
+        - name: ELASTICSEARCH_URL
+          value: http://10.4.7.12:9200
+      imagePullSecrets:
+      - name: harbor
+      securityContext: 
+        runAsUser: 0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: 
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600

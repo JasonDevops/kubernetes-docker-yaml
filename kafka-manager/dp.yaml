@@ -1,0 +1,41 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: kafka-manager
+  namespace: infra
+  labels: 
+    name: kafka-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: kafka-manager
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: 
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600
+  template:
+    metadata:
+      labels: 
+        app: kafka-manager
+    spec:
+      containers:
+      - name: kafka-manager
+        image: harbor.od.com/infra/kafka-manager:v2.0.0.2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        env:
+        - name: ZK_HOSTS
+          value: zk1.od.com:2181
+        - name: APPLICATION_SECRET
+          value: letmein
+      imagePullSecrets:
+      - name: harbor
+      terminationGracePeriodSeconds: 30
+      securityContext: 
+        runAsUser: 0

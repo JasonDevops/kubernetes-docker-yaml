@@ -1,0 +1,14 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata: 
+  name: apollo-portal
+  namespace: infra
+spec:
+  rules:
+  - host: portal.od.com
+    http:
+      paths:
+      - path: /
+        backend: 
+          serviceName: apollo-portal
+          servicePort: 8080

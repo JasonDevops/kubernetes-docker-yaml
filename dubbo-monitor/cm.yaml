@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dubbo-monitor-cm
+  namespace: infra
+data:
+  dubbo.properties: |
+    dubbo.container=log4j,spring,registry,jetty
+    dubbo.application.name=simple-monitor
+    dubbo.application.owner=OldboyEdu
+    dubbo.registry.address=zookeeper://zk1.od.com:2181
+    dubbo.protocol.port=20880
+    dubbo.jetty.port=8080
+    dubbo.jetty.directory=/dubbo-monitor-simple/monitor
+    dubbo.charts.directory=/dubbo-monitor-simple/charts
+    dubbo.statistics.directory=/dubbo-monitor-simple/statistics
+    dubbo.log4j.file=/dubbo-monitor-simple/logs/dubbo-monitor.log
+    dubbo.log4j.level=WARN

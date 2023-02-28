@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: eureka 
+  namespace: test
+spec:
+  rules:
+    - host: eureka.od.com 
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: eureka 
+            servicePort: 8888

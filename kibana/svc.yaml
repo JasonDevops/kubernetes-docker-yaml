@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata: 
+  name: kibana
+  namespace: infra
+spec:
+  ports:
+  - protocol: TCP
+    port: 5601
+    targetPort: 5601
+  selector: 
+    app: kibana

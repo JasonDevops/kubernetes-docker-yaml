@@ -1,0 +1,81 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: custom-config
+  namespace: armory
+data:
+  clouddriver-local.yml: |
+    kubernetes:
+      enabled: true
+      accounts:
+        - name: cluster-admin
+          serviceAccount: false
+          dockerRegistries:
+            - accountName: harbor
+              namespace: []
+          namespaces:
+            - test
+            - prod
+          kubeconfigFile: /opt/spinnaker/credentials/custom/default-kubeconfig
+      primaryAccount: cluster-admin
+    dockerRegistry:
+      enabled: true
+      accounts:
+        - name: harbor
+          requiredGroupMembership: []
+          providerVersion: V1
+          insecureRegistry: true
+          address: http://harbor.od.com
+          username: admin
+          password: Harbor12345
+      primaryAccount: harbor
+    artifacts:
+      s3:
+        enabled: true
+        accounts:
+        - name: armory-config-s3-account
+          apiEndpoint: http://minio
+          apiRegion: us-east-1
+      gcs:
+        enabled: false
+        accounts:
+        - name: armory-config-gcs-account
+  custom-config.json: ""
+  echo-configurator.yml: |
+    diagnostics:
+      enabled: true
+  front50-local.yml: |
+    spinnaker:
+      s3:
+        endpoint: http://minio
+  igor-local.yml: |
+    jenkins:
+      enabled: true
+      masters:
+        - name: jenkins-admin
+          address: http://jenkins.od.com
+          username: admin
+          password: admin123
+      primaryAccount: jenkins-admin
+  nginx.conf: |
+    gzip on;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml image/x-icon;
+
+    server {
+           listen 80;
+
+           location / {
+                proxy_pass http://armory-deck/;
+           }
+
+           location /api/ {
+                proxy_pass http://armory-gate:8084/;
+           }
+
+           rewrite ^/login(.*)$ /api/login$1 last;
+           rewrite ^/auth(.*)$ /api/auth$1 last;
+    }
+  spinnaker-local.yml: |
+    services:
+      igor:
+        enabled: true

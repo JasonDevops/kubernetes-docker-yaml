@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: sonarqube
+  name: sonarqube
+  namespace: infra
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      containers:
+        - name: sonarqube
+          image: sonarqube:7.1
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1024Mi
+            limits:
+              cpu: 2000m
+              memory: 2048Mi
+          volumeMounts:
+          - mountPath: "/opt/sonarqube/data/"
+            name: data
+          - mountPath: "/opt/sonarqube/extensions/"
+            name: data
+          env:
+          - name: "SONARQUBE_JDBC_USERNAME"
+            value: "admin"
+          - name: "SONARQUBE_JDBC_URL"
+            value: "jdbc:postgresql://10.4.7.12/sonardb"
+          - name: "SONARQUBE_JDBC_PASSWORD"
+            value: "admin123"
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+      volumes:
+      - name: data
+        nfs: 
+          server: hdss7-200.host.com
+          path: /data/nfs-volume/sonar
+      imagePullSecrets:
+      - name: harbor

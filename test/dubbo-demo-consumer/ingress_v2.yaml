@@ -1,0 +1,13 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dubbo-demo-consumer
+  namespace: test
+spec:
+  routes:
+  - match: Host(`demo-test.od.com`)
+    kind: Rule
+    services:
+    - name: dubbo-demo-consumer
+      port: 8080
+

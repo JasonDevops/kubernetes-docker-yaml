@@ -1,0 +1,30 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: init-env
+  namespace: armory
+data:
+  API_HOST: http://spinnaker.od.com/api
+  ARMORY_ID: c02f0781-92f5-4e80-86db-0ba8fe7b8544
+  ARMORYSPINNAKER_CONF_STORE_BUCKET: armory-platform
+  ARMORYSPINNAKER_CONF_STORE_PREFIX: front50
+  ARMORYSPINNAKER_GCS_ENABLED: "false"
+  ARMORYSPINNAKER_S3_ENABLED: "true"
+  AUTH_ENABLED: "false"
+  AWS_REGION: us-east-1
+  BASE_IP: 127.0.0.1
+  CLOUDDRIVER_OPTS: -Dspring.profiles.active=armory,configurator,local
+  CONFIGURATOR_ENABLED: "false"
+  DECK_HOST: http://spinnaker.od.com
+  ECHO_OPTS: -Dspring.profiles.active=armory,configurator,local
+  GATE_OPTS: -Dspring.profiles.active=armory,configurator,local
+  IGOR_OPTS: -Dspring.profiles.active=armory,configurator,local
+  PLATFORM_ARCHITECTURE: k8s
+  REDIS_HOST: redis://redis:6379
+  SERVER_ADDRESS: 0.0.0.0
+  SPINNAKER_AWS_DEFAULT_REGION: us-east-1
+  SPINNAKER_AWS_ENABLED: "false"
+  SPINNAKER_CONFIG_DIR: /home/spinnaker/config
+  SPINNAKER_GOOGLE_PROJECT_CREDENTIALS_PATH: ""
+  SPINNAKER_HOME: /home/spinnaker
+  SPRING_PROFILES_ACTIVE: armory,configurator,local

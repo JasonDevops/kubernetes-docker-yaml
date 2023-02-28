@@ -1,0 +1,79 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: armory-nginx
+  name: armory-nginx
+  namespace: armory
+spec:
+  replicas: 1
+  revisionHistoryLimit: 7
+  selector:
+    matchLabels:
+      app: armory-nginx
+  template:
+    metadata:
+      annotations:
+        artifact.spinnaker.io/location: '"armory"'
+        artifact.spinnaker.io/name: '"armory-nginx"'
+        artifact.spinnaker.io/type: '"kubernetes/deployment"'
+        moniker.spinnaker.io/application: '"armory"'
+        moniker.spinnaker.io/cluster: '"nginx"'
+      labels:
+        app: armory-nginx
+    spec:
+      containers:
+      - name: armory-nginx
+        image: harbor.od.com/armory/nginx:v1.12.2
+        imagePullPolicy: Always
+        command:
+        - bash
+        - -c
+        args:
+        - bash /opt/spinnaker/config/default/fetch.sh nginx && nginx -g 'daemon off;'
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        - containerPort: 443
+          name: https
+          protocol: TCP
+        - containerPort: 8085
+          name: api
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 3
+          successThreshold: 5
+          timeoutSeconds: 1
+        volumeMounts:
+        - mountPath: /opt/spinnaker/config/default
+          name: default-config
+        - mountPath: /etc/nginx/conf.d
+          name: custom-config
+      imagePullSecrets:
+      - name: harbor
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: custom-config
+        name: custom-config
+      - configMap:
+          defaultMode: 420
+          name: default-config
+        name: default-config

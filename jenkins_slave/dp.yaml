@@ -1,0 +1,66 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: jenkins
+  namespace: infra
+  labels: 
+    name: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      name: jenkins
+  template:
+    metadata:
+      labels: 
+        app: jenkins 
+        name: jenkins
+    spec:
+      serviceAccount: jenkins
+      volumes:
+      - name: data
+        nfs: 
+          server: hdss7-200.host.com
+          path: /data/nfs-volume/jenkins_home
+      - name:  maven-repo
+        nfs: 
+          server: hdss7-200.host.com
+          path: /data/nfs-volume/maven_repo
+      - name: docker
+        hostPath: 
+          path: /run/docker.sock
+          type: ''
+      containers:
+      - name: jenkins
+        image: harbor.od.com/infra/jenkins:v2.204.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: web
+          protocol: TCP
+        - containerPort: 50000
+          name: agent
+          protocol: TCP
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms512m -Xmx512m -XX:PermSize=512m -XX:MaxPermSize=1024m -Duser.timezone=Asia/Shanghai"
+        - name: TRY_UPGRADE_IF_NO_MARKER
+          value: "true"
+        volumeMounts:
+        - name: data
+          mountPath: /var/jenkins_home
+        - name: maven-repo
+          mountPath: /root/.m2
+        - name: docker
+          mountPath: /run/docker.sock
+      imagePullSecrets:
+      - name: harbor
+      securityContext: 
+        runAsUser: 0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: 
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600 

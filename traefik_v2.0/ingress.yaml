@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-admin
+  namespace: kube-system
+spec:
+  routes:
+  - match: Host(`traefik.od.com`)
+    kind: Rule
+    services:
+    - name: traefik-service
+      port: 8080

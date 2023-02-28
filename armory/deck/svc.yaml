@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: armory-deck
+  namespace: armory
+spec:
+  ports:
+  - name: deck-port
+    port: 80
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app: armory-deck

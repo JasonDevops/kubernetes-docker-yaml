@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: armory-gate
+  namespace: armory
+spec:
+  ports:
+  - name: gate-port
+    port: 8084
+    protocol: TCP
+    targetPort: 8084
+  - name: gate-api-port
+    port: 8085
+    protocol: TCP
+    targetPort: 8085
+  selector:
+    app: armory-gate

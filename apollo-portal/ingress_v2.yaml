@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: apollo-portal
+  namespace: infra
+spec:
+  routes:
+  - match: Host(`portal.od.com`)
+    kind: Rule
+    services:
+    - name: apollo-portal
+      port: 8080

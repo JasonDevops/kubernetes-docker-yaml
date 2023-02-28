@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: armory-orca
+  namespace: armory
+spec:
+  ports:
+  - port: 8083
+    protocol: TCP
+    targetPort: 8083
+  selector:
+    app: armory-orca

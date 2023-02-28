@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: apollo-configservice
+  namespace: test
+spec:
+  routes:
+  - match: Host(`config-test.od.com`)
+    kind: Rule
+    services:
+    - name: apollo-configservice
+      port: 8080

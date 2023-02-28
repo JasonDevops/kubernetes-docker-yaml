@@ -1,0 +1,44 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: logstash
+  namespace: test
+  labels: 
+    name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      name: logstash
+  template:
+    metadata:
+      labels: 
+        app: logstash
+        name: logstash
+    spec:
+      containers:
+      - name: logstash
+        image: harbor.od.com/infra/logstash:v6.8.6
+        imagePullPolicy: IfNotPresent   
+        command: ["logstash","-f","/etc/logstash/logstash.conf"]
+        volumeMounts:
+        - mountPath: /etc/logstash
+          name: config
+      volumes:
+        - name: config
+          configMap:
+            name: logstash-kafka
+      imagePullSecrets:
+      - name: harbor
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      securityContext: 
+        runAsUser: 0
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: 
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600

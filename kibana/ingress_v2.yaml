@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kibana
+  namespace: infra
+spec:
+  routes:
+  - match: Host(`kibana.od.com`)
+    kind: Rule
+    services:
+    - name: kibana
+      port: 5601

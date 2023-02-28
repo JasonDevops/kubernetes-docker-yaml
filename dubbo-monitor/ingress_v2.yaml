@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dubbo-monitor
+  namespace: infra
+spec:
+  routes:
+  - match: Host(`dubbo-monitor.od.com`)
+    kind: Rule
+    services:
+    - name: dubbo-monitor
+      port: 8080
